@@ -11,4 +11,6 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
+  likeColor: '#189E13',
+  dislikeColor: '#DA0E0B',
 };
