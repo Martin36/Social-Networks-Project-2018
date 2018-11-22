@@ -8,6 +8,7 @@ import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RecommendationScreen from '../screens/RecommendationScreen';
+import MovieScreen from '../screens/MovieScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -83,11 +84,26 @@ RecommendationStack.navigationOptions = {
   )
 };
 
+const MovieStack = createStackNavigator({
+  Movie: MovieScreen,
+});
+
+MovieStack.navigationOptions = {
+  tabBarLabel: 'Movie',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-videocam' : 'md-videocam'}
+    />
+  )
+}
+
 
 export default createBottomTabNavigator({
+  MovieStack,
+  RecommendationStack,
   HomeStack,
   LinksStack,
   SettingsStack,
   LoginStack,
-  RecommendationStack
 });

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
-  Platform
+  Platform, ImageBackground,
 } from 'react-native';
 import { Icon } from 'expo';
 
@@ -114,7 +114,8 @@ export default class MovieCard extends React.Component {
             {...this.PanResponder.panHandlers}
             key={movie.id} style={[
               this.rotateAndTranslate,
-              styles.cardImageContainer]}>
+              styles.cardImageContainer,
+            ]}>
 
             <Animated.View style={{opacity: this.likeOpacity ,...styles.likeContainer}}>
               <Text style={styles.likeText}>LIKE</Text>
@@ -140,6 +141,10 @@ export default class MovieCard extends React.Component {
               />
             </Animated.View>
 
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>{movie.title}</Text>
+            </View>
+
             <Image style={styles.cardImage} source={movie.uri} />
           </Animated.View>
         )
@@ -151,6 +156,11 @@ export default class MovieCard extends React.Component {
               opacity: this.nextCardOpacity,
               transform: [{ scale: this.nextCardScale}],
               ...styles.cardImageContainer}}>
+
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>{movie.title}</Text>
+            </View>
+
             <Image style={styles.cardImage} source={movie.uri} />
           </Animated.View>
         )
@@ -245,5 +255,20 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     padding: 10,
   },
-
+  titleText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 30,
+  },
+  titleContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 50,
+    left: 10,
+    zIndex: 3,
+    width: '100%',
+  }
 });
