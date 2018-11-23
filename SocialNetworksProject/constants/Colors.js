@@ -13,4 +13,6 @@ export default {
   noticeText: '#fff',
   likeColor: '#189E13',
   dislikeColor: '#DA0E0B',
+  mainColor: '#ff8c00',
+  backgroundColor: '#222'
 };

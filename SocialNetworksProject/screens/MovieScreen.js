@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Icon } from 'expo';
 
+import Colors from '../constants/Colors';
+
 const movie = {
   id: "0",
   title: "Aquaman",
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     elevation: 2
   },
   titleText: {
-    color: '#ff8c00',
+    color: Colors.mainColor,
     fontSize: 30,
   },
   text: {
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   heartIcon: {
-    color: '#ff8c00',
+    color: Colors.mainColor,
   },
   iconContainer: {
     position: 'absolute',
