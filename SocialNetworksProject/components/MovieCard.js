@@ -103,8 +103,6 @@ export default class MovieCard extends React.Component {
   renderMovies = () => {
     return movies.map((movie, i) => {
 
-      const likeStyle = {...styles.thumbsUpIcon};
-
       if(i < this.state.currentIndex){
         return null;
       }

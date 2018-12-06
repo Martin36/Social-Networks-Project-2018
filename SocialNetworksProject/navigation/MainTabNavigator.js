@@ -9,6 +9,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RecommendationScreen from '../screens/RecommendationScreen';
 import MovieScreen from '../screens/MovieScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -98,12 +99,25 @@ MovieStack.navigationOptions = {
   )
 }
 
+const ProfileStack = createStackNavigator({
+  Profile: ProfileScreen,
+});
+
+ProfileStack.navigationOptions = {
+  tabBarLabel: 'Profile',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-person' : 'md-person'}
+    />
+  )
+}
+
 
 export default createBottomTabNavigator({
+  ProfileStack,
   MovieStack,
   RecommendationStack,
-  HomeStack,
-  LinksStack,
   SettingsStack,
   LoginStack,
 });
