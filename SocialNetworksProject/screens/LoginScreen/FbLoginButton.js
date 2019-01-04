@@ -15,20 +15,26 @@ const styles = StyleSheet.create({
 });
 
 export default class FBLoginButton extends Component {
+  constructor(props) {
+    super(props);
+
+    this.login = this.login.bind(this);
+  }
+
   async login() {
     try {
-      const {type, token, expires, permissions, declinedPermissions}
+      const {type, token}
         = await Facebook.logInWithReadPermissionsAsync('694006790992504');
 
       if (type == 'success') {
-        alert("Yay!");
+        this.props.onLogin(true, token);
       } else {
-        alert("Nay!");
+        this.props.onLogin(false);
       }
-    } catch ({message}) {
-      alert(`Login failed because: ${message}`);
     }
-
+    catch (err) {
+      this.props.onLogin(false, null, err);
+    }
   }
 
   render() {

@@ -1,29 +1,33 @@
 import React from 'react';
 import FbLoginButton from './FbLoginButton';
-import {
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
 
 export default class LoginScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: false
+    };
+
+    this.onLogin = this.onLogin.bind(this);
+  }
+
+  onLogin(wasSuccess, token, err) {
+    this.setState({
+      isLoggedIn: wasSuccess
+    });
+  }
+
   render() {
-    return (
-      <FbLoginButton />
-    )
+    if (this.state.isLoggedIn) {
+      return this.props.children;
+    } else {
+      return (
+        <FbLoginButton onLogin={this.onLogin} />
+      )
+    }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingRight: 20,
-    paddingLeft: 20,
-  }
-})

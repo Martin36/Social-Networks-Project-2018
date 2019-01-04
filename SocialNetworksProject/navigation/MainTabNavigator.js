@@ -6,7 +6,6 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import LoginScreen from '../screens/LoginScreen';
 import RecommendationScreen from '../screens/RecommendationScreen';
 import MovieScreen from '../screens/MovieScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -57,20 +56,6 @@ SettingsStack.navigationOptions = {
   ),
 };
 
-const LoginStack = createStackNavigator({
-  Login: LoginScreen,
-});
-
-LoginStack.navigationOptions = {
-  tabBarLabel: 'Login',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-exit' : 'md-exit'}
-    />
-  )
-};
-
 const RecommendationStack = createStackNavigator({
   Recommendation: RecommendationScreen,
 });
@@ -119,5 +104,4 @@ export default createBottomTabNavigator({
   MovieStack,
   RecommendationStack,
   SettingsStack,
-  LoginStack,
 });
