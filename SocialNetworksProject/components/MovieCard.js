@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
-  Platform, ImageBackground,
+  Platform, ImageBackground, TouchableHighlight,
 } from 'react-native';
 import { Icon } from 'expo';
 
@@ -19,8 +19,10 @@ const iconSize = 120;
 
 export default class MovieCard extends React.Component {
 
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
+
+    console.log(this.props);
 
     this.position = new Animated.ValueXY();
     this.state = {
@@ -62,6 +64,10 @@ export default class MovieCard extends React.Component {
     });
   }
 
+  redirectToMovieScreen = () => {
+    this.props.navigation.navigate("MovieStack");
+  }
+
   componentWillMount() {
     this.PanResponder = PanResponder.create({
 
@@ -89,6 +95,10 @@ export default class MovieCard extends React.Component {
               this.position.setValue({ x: 0, y: 0})
             })
           })
+        }
+        //If the user clicks on the card more information about the movie should be shown
+        else if(gestureState.dx > -10 && gestureState.dx < 10){
+          this.redirectToMovieScreen();
         }
         else {
           Animated.spring(this.position, {

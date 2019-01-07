@@ -19,7 +19,7 @@ export default class RecommendationScreen extends React.Component {
 
   render() {
     return(
-      <MovieCard></MovieCard>      
+      <MovieCard {...this.props}></MovieCard>      
     )
   }
 }
