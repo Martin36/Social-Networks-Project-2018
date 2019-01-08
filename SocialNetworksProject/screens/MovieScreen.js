@@ -50,7 +50,7 @@ export default class MovieScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.backText}
-              onPress={() => navigation.navigate("Recommendation")}>Back</Text>
+              onPress={() => navigation.goBack()}>Back</Text>
         <Image style={styles.heroImage} source={uri}></Image>
         <View style={styles.infoContainer}>
           <Text style={styles.titleText}>{title}</Text>
@@ -73,7 +73,7 @@ export default class MovieScreen extends React.Component {
               size={iconSize}
               style={styles.heartIcon}
               onPress={() => this.setState((state) => {
-                //TODO: add/remove this movie from the users liked movies 
+                //TODO: add/remove this movie from the users liked movies
                 return {liked: !state.liked}
               })}
             />

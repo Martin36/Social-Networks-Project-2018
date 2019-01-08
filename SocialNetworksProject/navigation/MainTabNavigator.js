@@ -102,6 +102,7 @@ RecommendationStack.navigationOptions = {
 
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
+  Movie: MovieScreen
 });
 
 ProfileStack.navigationOptions = {

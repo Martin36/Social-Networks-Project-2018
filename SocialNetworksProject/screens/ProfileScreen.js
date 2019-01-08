@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
-  Platform, ImageBackground,
+  Platform, ImageBackground, TouchableOpacity
 } from 'react-native';
 import { Icon } from 'expo';
 
@@ -14,9 +14,30 @@ const user = {
   name: "John Doe",
   profileUri: require("../assets/images/profile.jpg"),
   likedMovies: [
-    {id: "0", title: "Aquaman", uri: require('../assets/images/aquaman.jpg')},
-    {id: "1", title: "Bohemian Rhapsody", uri: require('../assets/images/bohemian-rhapsody.jpg')},
-    {id: "2", title: "Robin Hood", uri: require('../assets/images/robin-hood.jpg')},
+    {
+      id: "0",
+      title: "Aquaman",
+      uri: require('../assets/images/aquaman.jpg'),
+      summary: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
+      genres: ["Action", "Adventure", "Fantasy"],
+      releaseDate: "2018-12-13"
+    },
+    {
+      id: "1",
+      title: "Bohemian Rhapsody",
+      uri: require('../assets/images/bohemian-rhapsody.jpg'),
+      summary: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
+      genres: ["Biography", "Drama", "Music"],
+      releaseDate: "2018-10-31"
+    },
+    {
+      id: "2",
+      title: "Robin Hood",
+      uri: require('../assets/images/robin-hood.jpg'),
+      summary: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
+      genres: ["Action", "Adventure", "Thriller"],
+      releaseDate: "2018-11-30"
+    },
   ]
 }
 
@@ -30,7 +51,8 @@ export default class ProfileScreen extends React.Component {
   renderMovies = () => {
     return user.likedMovies.map((movie, i) => {
       return (
-        <View key={movie.id} style={styles.listItem}>
+        <TouchableOpacity key={movie.id} style={styles.listItem}
+          onPress={() => this.props.navigation.navigate("Movie", movie)}>
           <Image style={styles.movieImage} source={movie.uri} />
           <Text style={styles.movieTitle}>{movie.title}</Text>
           <Icon.Ionicons
@@ -38,7 +60,7 @@ export default class ProfileScreen extends React.Component {
             size={iconSize}
             style={styles.arrowIcon}
             />
-        </View>
+        </TouchableOpacity>
       )
     })
   }
