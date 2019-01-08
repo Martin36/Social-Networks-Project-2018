@@ -10,9 +10,30 @@ import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 
 const movies = [
-  {id: "0", title: "Aquaman", uri: require('../assets/images/aquaman.jpg')},
-  {id: "1", title: "Bohemian Rhapsody", uri: require('../assets/images/bohemian-rhapsody.jpg')},
-  {id: "2", title: "Robin Hood", uri: require('../assets/images/robin-hood.jpg')},
+  {
+    id: "0",
+    title: "Aquaman",
+    uri: require('../assets/images/aquaman.jpg'),
+    summary: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
+    genres: ["Action", "Adventure", "Fantasy"],
+    releaseDate: "2018-12-13"
+  },
+  {
+    id: "1",
+    title: "Bohemian Rhapsody",
+    uri: require('../assets/images/bohemian-rhapsody.jpg'),
+    summary: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
+    genres: ["Biography", "Drama", "Music"],
+    releaseDate: "2018-10-31"
+  },
+  {
+    id: "2",
+    title: "Robin Hood",
+    uri: require('../assets/images/robin-hood.jpg'),
+    summary: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
+    genres: ["Action", "Adventure", "Thriller"],
+    releaseDate: "2018-11-30"
+  },
 ]
 
 const iconSize = 120;
@@ -22,7 +43,7 @@ export default class MovieCard extends React.Component {
   constructor(props){
     super(props);
 
-    console.log(this.props);
+    //console.log(this.props);
 
     this.position = new Animated.ValueXY();
     this.state = {
@@ -64,8 +85,8 @@ export default class MovieCard extends React.Component {
     });
   }
 
-  redirectToMovieScreen = () => {
-    this.props.navigation.navigate("MovieStack");
+  redirectToMovieScreen = (movie) => {
+    this.props.navigation.navigate("Movie", movie);
   }
 
   componentWillMount() {
@@ -98,7 +119,7 @@ export default class MovieCard extends React.Component {
         }
         //If the user clicks on the card more information about the movie should be shown
         else if(gestureState.dx > -10 && gestureState.dx < 10){
-          this.redirectToMovieScreen();
+          this.redirectToMovieScreen(movies[this.state.currentIndex]);
         }
         else {
           Animated.spring(this.position, {

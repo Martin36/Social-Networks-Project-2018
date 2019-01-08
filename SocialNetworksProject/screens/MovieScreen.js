@@ -28,23 +28,34 @@ export default class MovieScreen extends React.Component {
     header: null,
   };
 
+  constructor(props){
+    super(props);
+  }
+
   render() {
+    const { navigation } = this.props;
+    const title = navigation.getParam('title');
+    const uri = navigation.getParam('uri');
+    const summary = navigation.getParam('summary');
+    const genres = navigation.getParam('genres');
+    const releaseDate = navigation.getParam('releaseDate');
+
     return (
       <View style={styles.container}>
-        <Image style={styles.heroImage} source={movie.uri}></Image>
+        <Image style={styles.heroImage} source={uri}></Image>
         <View style={styles.infoContainer}>
-          <Text style={styles.titleText}>{movie.title}</Text>
+          <Text style={styles.titleText}>{title}</Text>
           <Text style={styles.text}>
             <Text style={{fontWeight: 'bold'}}>Genres: </Text>
-            {movie.genres.join(', ')}
+            {genres.join(', ')}
           </Text>
           <Text style={styles.text}>
             <Text style={{fontWeight: 'bold'}}>Release Date: </Text>
-            {movie.releaseDate}
+            {releaseDate}
           </Text>
           <Text style={styles.summary}>
             <Text style={{fontWeight: 'bold'}}>Summary: </Text>
-            {movie.summary}
+            {summary}
           </Text>
 
           <View style={styles.iconContainer}>

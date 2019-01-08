@@ -73,6 +73,7 @@ LoginStack.navigationOptions = {
 
 const RecommendationStack = createStackNavigator({
   Recommendation: RecommendationScreen,
+  Movie: MovieScreen
 });
 
 RecommendationStack.navigationOptions = {
@@ -85,19 +86,19 @@ RecommendationStack.navigationOptions = {
   )
 };
 
-const MovieStack = createStackNavigator({
-  Movie: MovieScreen,
-});
+// const MovieStack = createStackNavigator({
+//   Movie: MovieScreen,
+// });
 
-MovieStack.navigationOptions = {
-  tabBarLabel: 'Movie',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-videocam' : 'md-videocam'}
-    />
-  )
-}
+// MovieStack.navigationOptions = {
+//   tabBarLabel: 'Movie',
+//   tabBarIcon: ({ focused }) => (
+//     <TabBarIcon
+//       focused={focused}
+//       name={Platform.OS === 'ios' ? 'ios-videocam' : 'md-videocam'}
+//     />
+//   )
+// }
 
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
@@ -113,10 +114,8 @@ ProfileStack.navigationOptions = {
   )
 }
 
-
 export default createBottomTabNavigator({
   ProfileStack,
-  MovieStack,
   RecommendationStack,
   SettingsStack,
   LoginStack,
