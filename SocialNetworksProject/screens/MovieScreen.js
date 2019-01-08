@@ -30,7 +30,11 @@ export default class MovieScreen extends React.Component {
 
   constructor(props){
     super(props);
+    this.state = {
+      liked: false
+    }
   }
+
 
   render() {
     const { navigation } = this.props;
@@ -40,8 +44,13 @@ export default class MovieScreen extends React.Component {
     const genres = navigation.getParam('genres');
     const releaseDate = navigation.getParam('releaseDate');
 
+    const heartIconAndroid = this.state.liked ? 'md-heart' : 'md-heart-empty';
+    const heartIconIos = this.state.liked ? 'ios-heart' : 'ios-heart-empty';
+
     return (
       <View style={styles.container}>
+        <Text style={styles.backText}
+              onPress={() => navigation.navigate("Recommendation")}>Back</Text>
         <Image style={styles.heroImage} source={uri}></Image>
         <View style={styles.infoContainer}>
           <Text style={styles.titleText}>{title}</Text>
@@ -60,9 +69,13 @@ export default class MovieScreen extends React.Component {
 
           <View style={styles.iconContainer}>
             <Icon.Ionicons
-              name={Platform.OS === 'ios' ? 'ios-heart-empty' : 'md-heart-empty'}
+              name={Platform.OS === 'ios' ? heartIconIos : heartIconAndroid}
               size={iconSize}
               style={styles.heartIcon}
+              onPress={() => this.setState((state) => {
+                //TODO: add/remove this movie from the users liked movies 
+                return {liked: !state.liked}
+              })}
             />
           </View>
 
@@ -117,5 +130,13 @@ const styles = StyleSheet.create({
     right: 30,
     zIndex: 2,
   },
+  backText: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 2,
+    color: '#fff',
+    fontSize: 20
+  }
 
 })
