@@ -4,37 +4,44 @@ import {
   StyleSheet, Image, PanResponder,
   Platform, ImageBackground, TouchableHighlight,
 } from 'react-native';
-import { Icon } from 'expo';
+import { Icon, LinearGradient } from 'expo';
 
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 
-const movies = [
-  {
-    id: "0",
-    title: "Aquaman",
-    uri: require('../assets/images/aquaman.jpg'),
-    summary: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
-    genres: ["Action", "Adventure", "Fantasy"],
-    releaseDate: "2018-12-13"
-  },
-  {
-    id: "1",
-    title: "Bohemian Rhapsody",
-    uri: require('../assets/images/bohemian-rhapsody.jpg'),
-    summary: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
-    genres: ["Biography", "Drama", "Music"],
-    releaseDate: "2018-10-31"
-  },
-  {
-    id: "2",
-    title: "Robin Hood",
-    uri: require('../assets/images/robin-hood.jpg'),
-    summary: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
-    genres: ["Action", "Adventure", "Thriller"],
-    releaseDate: "2018-11-30"
-  },
-]
+var allMovies = require('../assets/data/dump_with_images.json');
+// Take first 10 movies
+movies = allMovies.slice(0, 10);
+// Add id to movies
+for(let i = 0; i < movies.length; i++)
+  movies[i].id = i;
+
+// const movies = [
+//   {
+//     id: "0",
+//     title: "Aquaman",
+//     image_url: require('../assets/images/aquaman.jpg'),
+//     description: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
+//     genres: ["Action", "Adventure", "Fantasy"],
+//     releaseDate: "2018-12-13"
+//   },
+//   {
+//     id: "1",
+//     title: "Bohemian Rhapsody",
+//     image_url: require('../assets/images/bohemian-rhapsody.jpg'),
+//     description: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
+//     genres: ["Biography", "Drama", "Music"],
+//     releaseDate: "2018-10-31"
+//   },
+//   {
+//     id: "2",
+//     title: "Robin Hood",
+//     image_url: require('../assets/images/robin-hood.jpg'),
+//     description: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
+//     genres: ["Action", "Adventure", "Thriller"],
+//     releaseDate: "2018-11-30"
+//   },
+// ]
 
 const iconSize = 120;
 
@@ -170,11 +177,12 @@ export default class MovieCard extends React.Component {
               />
             </Animated.View>
 
-            <View style={styles.titleContainer}>
+            <LinearGradient style={styles.gradient}
+              colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 1)']}>
               <Text style={styles.titleText}>{movie.title}</Text>
-            </View>
+            </LinearGradient>
 
-            <Image style={styles.cardImage} source={movie.uri} />
+            <Image style={styles.cardImage} source={{uri: movie.image_url}} />
           </Animated.View>
         )
       }
@@ -186,16 +194,19 @@ export default class MovieCard extends React.Component {
               transform: [{ scale: this.nextCardScale}],
               ...styles.cardImageContainer}}>
 
-            <View style={styles.titleContainer}>
+            <LinearGradient style={styles.gradient}
+              colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 1)']}>
               <Text style={styles.titleText}>{movie.title}</Text>
-            </View>
+            </LinearGradient>
 
-            <Image style={styles.cardImage} source={movie.uri} />
+            <Image style={styles.cardImage} source={{uri: movie.image_url}} />
           </Animated.View>
         )
       }
     }).reverse();
   }
+  // <View style={styles.titleContainer}>
+  // </View>
 
   render() {
     return (
@@ -299,5 +310,20 @@ const styles = StyleSheet.create({
     left: 10,
     zIndex: 3,
     width: '100%',
+  },
+  gradient: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    paddingBottom: 10,
+    paddingTop: 30,
+    left: 10,
+    bottom: 10,
+    zIndex: 3,
+    width: '100%',
+    borderRadius: 20,
+    height: '40%',
   }
 });

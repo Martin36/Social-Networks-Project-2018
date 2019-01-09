@@ -12,15 +12,6 @@ import { Icon } from 'expo';
 
 import Colors from '../constants/Colors';
 
-const movie = {
-  id: "0",
-  title: "Aquaman",
-  uri: require('../assets/images/aquaman.jpg'),
-  summary: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
-  genres: ["Action", "Adventure", "Fantasy"],
-  releaseDate: "2018-12-13"
-}
-
 const iconSize = 30;
 
 export default class MovieScreen extends React.Component {
@@ -39,9 +30,9 @@ export default class MovieScreen extends React.Component {
   render() {
     const { navigation } = this.props;
     const title = navigation.getParam('title');
-    const uri = navigation.getParam('uri');
-    const summary = navigation.getParam('summary');
-    const genres = navigation.getParam('genres');
+    const image_url = navigation.getParam('image_url');
+    const description = navigation.getParam('description');
+    const genres = navigation.getParam('genres', ['Unknown']);
     const releaseDate = navigation.getParam('releaseDate');
 
     const heartIconAndroid = this.state.liked ? 'md-heart' : 'md-heart-empty';
@@ -51,7 +42,7 @@ export default class MovieScreen extends React.Component {
       <View style={styles.container}>
         <Text style={styles.backText}
               onPress={() => navigation.goBack()}>Back</Text>
-        <Image style={styles.heroImage} source={uri}></Image>
+            <Image style={styles.heroImage} source={{uri: image_url}}></Image>
         <View style={styles.infoContainer}>
           <Text style={styles.titleText}>{title}</Text>
           <Text style={styles.text}>
@@ -64,7 +55,7 @@ export default class MovieScreen extends React.Component {
           </Text>
           <Text style={styles.summary}>
             <Text style={{fontWeight: 'bold'}}>Summary: </Text>
-            {summary}
+            {description}
           </Text>
 
           <View style={styles.iconContainer}>
