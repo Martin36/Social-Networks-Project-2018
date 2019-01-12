@@ -16,33 +16,6 @@ movies = allMovies.slice(0, 10);
 for(let i = 0; i < movies.length; i++)
   movies[i].id = i;
 
-// const movies = [
-//   {
-//     id: "0",
-//     title: "Aquaman",
-//     image_url: require('../assets/images/aquaman.jpg'),
-//     description: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
-//     genres: ["Action", "Adventure", "Fantasy"],
-//     releaseDate: "2018-12-13"
-//   },
-//   {
-//     id: "1",
-//     title: "Bohemian Rhapsody",
-//     image_url: require('../assets/images/bohemian-rhapsody.jpg'),
-//     description: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
-//     genres: ["Biography", "Drama", "Music"],
-//     releaseDate: "2018-10-31"
-//   },
-//   {
-//     id: "2",
-//     title: "Robin Hood",
-//     image_url: require('../assets/images/robin-hood.jpg'),
-//     description: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
-//     genres: ["Action", "Adventure", "Thriller"],
-//     releaseDate: "2018-11-30"
-//   },
-// ]
-
 const iconSize = 120;
 
 export default class MovieCard extends React.Component {
@@ -205,8 +178,6 @@ export default class MovieCard extends React.Component {
       }
     }).reverse();
   }
-  // <View style={styles.titleContainer}>
-  // </View>
 
   render() {
     return (

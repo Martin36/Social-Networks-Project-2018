@@ -1,18 +1,10 @@
 import React, { Component } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import {
+  View, Button, StyleSheet,
+  TouchableOpacity, Text } from 'react-native';
 import { Facebook } from 'expo';
 
-const styles = StyleSheet.create({
-  fbLoginContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  fbLoginButton: {
-    marginTop: "100px",
-    width: "80%",
-    height: "10%",
-  }
-});
+import Colors from '../constants/Colors';
 
 export default class FBLoginButton extends Component {
   constructor(props) {
@@ -39,12 +31,37 @@ export default class FBLoginButton extends Component {
 
   render() {
     return (
-      <View style={styles.fbLoginContainer}>
-        <View style={{ height: 60 }} />
-        <Button style={styles.fbLoginButton} title="Login" onPress={this.login}>Login</Button>
-      </View>
+      <TouchableOpacity
+        style={styles.fbLoginButton}
+        onPress={this.login}>
+        <Text style={styles.loginText}>Login with Facebook</Text>
+      </TouchableOpacity>
     );
   }
 };
+
+const styles = StyleSheet.create({
+  fbLoginButton: {
+    width: '80%',
+    height: '10%',
+    backgroundColor: Colors.fbBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 0,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 3
+    },
+    shadowRadius: 5,
+    shadowOpacity: 1.0,
+    elevation: 5,
+  },
+  loginText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  }
+});
 
 module.exports = FBLoginButton;
