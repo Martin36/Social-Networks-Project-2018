@@ -12,6 +12,8 @@ import {
 
 import MovieCard from '../components/MovieCard';
 
+import Colors from '../constants/Colors';
+
 export default class RecommendationScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -19,7 +21,7 @@ export default class RecommendationScreen extends React.Component {
 
   render() {
     return(
-      <MovieCard {...this.props}></MovieCard>      
+        <MovieCard {...this.props}></MovieCard>
     )
   }
 }

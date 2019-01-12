@@ -10,6 +10,8 @@ import RecommendationScreen from '../screens/RecommendationScreen';
 import MovieScreen from '../screens/MovieScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
+import Colors from '../constants/Colors';
+
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
 });
@@ -71,20 +73,6 @@ RecommendationStack.navigationOptions = {
   )
 };
 
-// const MovieStack = createStackNavigator({
-//   Movie: MovieScreen,
-// });
-
-// MovieStack.navigationOptions = {
-//   tabBarLabel: 'Movie',
-//   tabBarIcon: ({ focused }) => (
-//     <TabBarIcon
-//       focused={focused}
-//       name={Platform.OS === 'ios' ? 'ios-videocam' : 'md-videocam'}
-//     />
-//   )
-// }
-
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
   Movie: MovieScreen
@@ -99,9 +87,17 @@ ProfileStack.navigationOptions = {
     />
   )
 }
+const tabBarConfig = {
+  tabBarOptions: {
+    activeTintColor: Colors.mainColor,
+    activeBackgroundColor: Colors.backgroundColor,
+    inactiveTintColor: 'white',
+    inactiveBackgroundColor: Colors.backgroundColor,
+  }
+}
 
 export default createBottomTabNavigator({
   ProfileStack,
   RecommendationStack,
   SettingsStack,
-});
+}, tabBarConfig);

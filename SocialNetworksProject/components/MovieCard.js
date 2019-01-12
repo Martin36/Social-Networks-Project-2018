@@ -204,6 +204,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
   cardHeader: {
     height: 60,
