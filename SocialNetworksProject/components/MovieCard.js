@@ -8,13 +8,7 @@ import { Icon, LinearGradient } from 'expo';
 
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
-
-var allMovies = require('../assets/data/dump_with_images.json');
-// Take first 10 movies
-movies = allMovies.slice(0, 10);
-// Add id to movies
-for(let i = 0; i < movies.length; i++)
-  movies[i].id = i;
+import Api, { MockApi } from '../common/api';
 
 const iconSize = 120;
 
@@ -24,6 +18,8 @@ export default class MovieCard extends React.Component {
     super(props);
 
     //console.log(this.props);
+
+    this.state = {};
 
     this.position = new Animated.ValueXY();
     this.state = {
@@ -63,6 +59,16 @@ export default class MovieCard extends React.Component {
       outputRange: [1, 0.8, 1],
       extrapolate: 'clamp'
     });
+  }
+
+  componentDidMount() {
+    const api = new MockApi('');
+    // const api = new Api('192.168.0.2:9990');
+    const userInfo = this.props.userInfo;
+    api.getRecommendations(userInfo.email, 0, 10)
+      .then(response => {
+        console.log(response)
+      });
   }
 
   redirectToMovieScreen = (movie) => {
