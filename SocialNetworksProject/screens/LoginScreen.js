@@ -21,8 +21,9 @@ export default class LoginScreen extends React.Component {
   }
 
   onLogin(wasSuccess, token, err) {
-    //TODO: Here we would need to get the user from our database or
-    //Create new user if they don't exist
+
+    console.log(`Login result: ${wasSuccess} - user token is: ${token}`);
+
     this.setState({
       isLoggedIn: wasSuccess,
       userToken: token,
@@ -31,7 +32,13 @@ export default class LoginScreen extends React.Component {
 
   render() {
     if (this.state.isLoggedIn) {
-      return <this.props.children  facebookToken={this.state.userToken} />;
+      const { children } = this.props;
+
+      const childrenWithProps = React.Children.map(children, child =>
+        React.cloneElement(child, { token: this.state.userToken })
+      );
+
+      return <div>{childrenWithProps}</div>
     } else {
       return (
         <LinearGradient
