@@ -1,7 +1,12 @@
+import axios from 'axios';
+
 export default class FBApi {
-    getUserInfo(token) {
-        return {
-            email: 'jakubtrad@gmail.com'
-        };
+    constructor(token) {
+        this.token = token;
+    }
+
+    getUserInfo() {
+        console.log('Getting user info from facebook.');
+        return [];
     }
 }

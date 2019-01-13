@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AsyncStorage,
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
   Platform, ImageBackground, TouchableHighlight,
@@ -9,6 +10,9 @@ import { Icon, LinearGradient } from 'expo';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 import Api, { MockApi } from '../common/api';
+import { GlobalState } from '../common/state';
+import FBApi from '../common/fbApi';
+import axios from 'axios';
 
 const iconSize = 120;
 
@@ -17,14 +21,12 @@ export default class MovieCard extends React.Component {
   constructor(props){
     super(props);
 
-    console.log(`Starting MovieCard, props: ${this.props}`);
-
-    this.state = {};
-
     this.position = new Animated.ValueXY();
     this.state = {
       currentIndex: 0
     }
+
+    this.updateMovieList = this.updateMovieList.bind(this);
 
     this.rotate = this.position.x.interpolate({
       inputRange: [-Layout.window.width/2, 0, Layout.window.width/2],
@@ -61,21 +63,48 @@ export default class MovieCard extends React.Component {
     });
   }
 
-  componentDidMount() {
-    const api = new MockApi('');
-    // const api = new Api('192.168.0.2:9990');
-    const userInfo = this.props.userInfo;
-    api.getRecommendations(userInfo.email, 0, 10)
-      .then(response => {
-        console.log(response)
-      });
+  updateMovieList(movies) {
+    this.setState({
+      ...this.state,
+      movies
+    });
   }
 
   redirectToMovieScreen = (movie) => {
     this.props.navigation.navigate("Movie", movie);
   }
 
+  async getNextBatchOfMovies() {
+    try
+    {
+      console.log("Getting next batch of movies.");
+      const userToken = await AsyncStorage.getItem('userToken');
+      console.log('User token is ', userToken);
+
+      console.log('Aquiring facebook info...');
+      const result = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${userToken}`);
+      const hostString = await AsyncStorage.getItem('hostString');
+      const { email } = result.data;
+
+      console.log('Email is ', email);
+
+      const api = new MockApi(hostString);
+
+      console.log(`Getting recommendations for user ${email}.`);
+      return api.getRecommendations(email, 0, 10);
+    }
+    catch (e) {
+      console.log('Error happened :(');
+      console.log(e);
+      return [];
+    }
+  }
+
   componentWillMount() {
+
+    this.getNextBatchOfMovies()
+      .then(this.updateMovieList);
+
     this.PanResponder = PanResponder.create({
 
       onStartShouldSetPanResponder: (evt, gestureState) => true,
@@ -105,7 +134,7 @@ export default class MovieCard extends React.Component {
         }
         //If the user clicks on the card more information about the movie should be shown
         else if(gestureState.dx > -10 && gestureState.dx < 10){
-          this.redirectToMovieScreen(movies[this.state.currentIndex]);
+          this.redirectToMovieScreen(this.state.movies[this.state.currentIndex]);
         }
         else {
           Animated.spring(this.position, {
@@ -118,16 +147,17 @@ export default class MovieCard extends React.Component {
   }
 
   renderMovies = () => {
-    return movies.map((movie, i) => {
+    if (!this.state.movies) {
+      return null;
+    }
 
-      if(i < this.state.currentIndex){
-        return null;
-      }
-      else if(i == this.state.currentIndex){
+    const moviesToRender = this.state.movies.filter((_, i) => i >= this.state.currentIndex);
+    return moviesToRender.map((movie, i) => {
+      if(i == this.state.currentIndex) {
         return (
           <Animated.View
             {...this.PanResponder.panHandlers}
-            key={movie.id} style={[
+            key={i} style={[
               this.rotateAndTranslate,
               styles.cardImageContainer,
             ]}>
@@ -168,7 +198,7 @@ export default class MovieCard extends React.Component {
       else{
         return (
           <Animated.View
-            key={movie.id} style={{
+            key={i} style={{
               opacity: this.nextCardOpacity,
               transform: [{ scale: this.nextCardScale}],
               ...styles.cardImageContainer}}>
@@ -186,6 +216,11 @@ export default class MovieCard extends React.Component {
   }
 
   render() {
+    if (!this.state.movies) {
+      return <View>
+        <Text>"Loading movies..."</Text>
+      </View>;
+    }
     return (
       <View style={styles.cardContainer}>
         <View style={styles.cardHeader}>

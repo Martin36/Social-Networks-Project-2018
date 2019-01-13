@@ -1,10 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View } from 'react-native';
 import FbLoginButton from '../components/FbLoginButton';
 import { LinearGradient } from 'expo';
 
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
+import AppNavigator from '../navigation/AppNavigator';
+
 
 export default class LoginScreen extends React.Component {
   static navigationOptions = {
@@ -28,17 +30,21 @@ export default class LoginScreen extends React.Component {
       isLoggedIn: wasSuccess,
       userToken: token,
     });
+
+    AsyncStorage.setItem('userToken', token)
+      .then(() => {
+        console.log('Saved user token to async storage');
+      });
+
+    AsyncStorage.setItem('hostString', '192.168.0.1:9990')
+      .then(() => console.log('Set default host string'));
   }
 
   render() {
     if (this.state.isLoggedIn) {
-      const { children } = this.props;
 
-      const childrenWithProps = React.Children.map(children, child =>
-        React.cloneElement(child, { token: this.state.userToken })
-      );
+      return <AppNavigator />;
 
-      return <div>{childrenWithProps}</div>
     } else {
       return (
         <LinearGradient
