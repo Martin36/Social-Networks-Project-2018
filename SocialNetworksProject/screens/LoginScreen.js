@@ -36,7 +36,7 @@ export default class LoginScreen extends React.Component {
         console.log('Saved user token to async storage');
       });
 
-    AsyncStorage.setItem('hostString', '192.168.0.1:9990')
+    AsyncStorage.setItem('hostString', 'mock')
       .then(() => console.log('Set default host string'));
   }
 

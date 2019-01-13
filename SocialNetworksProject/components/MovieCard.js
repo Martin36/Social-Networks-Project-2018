@@ -23,7 +23,8 @@ export default class MovieCard extends React.Component {
 
     this.position = new Animated.ValueXY();
     this.state = {
-      currentIndex: 0
+      currentIndex: 0,
+      movies: [],
     }
 
     this.updateMovieList = this.updateMovieList.bind(this);
@@ -66,7 +67,7 @@ export default class MovieCard extends React.Component {
   updateMovieList(movies) {
     this.setState({
       ...this.state,
-      movies
+      movies: this.state.movies.concat(movies)
     });
   }
 
@@ -88,7 +89,7 @@ export default class MovieCard extends React.Component {
 
       console.log('Email is ', email);
 
-      const api = new MockApi(hostString);
+      const api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
 
       console.log(`Getting recommendations for user ${email}.`);
       return api.getRecommendations(email, 0, 10);
