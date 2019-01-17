@@ -16,6 +16,7 @@ import axios from 'axios';
 
 const iconSize = 120;
 
+
 export default class MovieCard extends React.Component {
 
   constructor(props){
@@ -65,6 +66,10 @@ export default class MovieCard extends React.Component {
   }
 
   updateMovieList(movies) {
+    //Create list of movies
+    movies = movies.movies.map((movie) => {
+      return movie.movie;
+    });
     this.setState({
       ...this.state,
       movies: this.state.movies.concat(movies)
@@ -84,8 +89,12 @@ export default class MovieCard extends React.Component {
 
       console.log('Aquiring facebook info...');
       const fb = new FBApi(userToken);
-      const { email } = await fb.getUserInfo();
-      const hostString = await AsyncStorage.getItem('hostString');
+
+      //Example call: http://192.168.5.9:8080/MovieRecommendation/l@gmail.com/10/10
+      const email = 'l@gmail.com';
+      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
+      // const { email } = await fb.getUserInfo();
+      // const hostString = await AsyncStorage.getItem('hostString');
 
       console.log('Email is ', email);
 
@@ -152,9 +161,13 @@ export default class MovieCard extends React.Component {
       return null;
     }
 
-    const moviesToRender = this.state.movies.filter((_, i) => i >= this.state.currentIndex);
-    return moviesToRender.map((movie, i) => {
-      if(i == this.state.currentIndex) {
+    console.log(this.state.currentIndex);
+
+    return this.state.movies.map((movie, i) => {
+      if(i < this.state.currentIndex){
+        return null;
+      }
+      else if(i == this.state.currentIndex) {
         return (
           <Animated.View
             {...this.PanResponder.panHandlers}
@@ -217,7 +230,7 @@ export default class MovieCard extends React.Component {
   }
 
   render() {
-    if (!this.state.movies) {
+    if (this.state.movies.length === 0) {
       return <View>
         <Text>"Loading movies..."</Text>
       </View>;

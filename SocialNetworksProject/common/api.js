@@ -6,7 +6,9 @@ export default class Api {
     }
 
     async get(path) {
+        console.log(`${this.host_string}/${path}`);
         const result = await axios.get(`${this.host_string}/${path}`);
+        console.log(result.data);
         return result.data;
     }
 
@@ -35,7 +37,6 @@ export class MockApi extends Api {
     constructor(host_string) {
         super(host_string);
     }
-
     async getRecommendations(userId, start, n) {
         return new Promise((resolve, reject) => {
             const movies = [
