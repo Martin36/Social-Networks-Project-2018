@@ -26,6 +26,8 @@ export default class MovieCard extends React.Component {
     this.state = {
       currentIndex: 0,
       movies: [],
+      likedMovies: [],
+      dislikedMovies: [],
     }
 
     this.updateMovieList = this.updateMovieList.bind(this);
@@ -122,21 +124,29 @@ export default class MovieCard extends React.Component {
         this.position.setValue({ x: gestureState.dx, y: gestureState.dy })
       },
       onPanResponderRelease: (evt, gestureState) => {
+        //User liked the movie
         if(gestureState.dx > 120) {
           Animated.spring(this.position, {
             toValue: { x: Layout.window.width + 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              likedMovies: this.state.likedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
               this.position.setValue({ x: 0, y: 0})
             })
           })
         }
+        //User disliked the movie
         else if(gestureState.dx < -120) {
           Animated.spring(this.position, {
             toValue: { x: -Layout.window.width - 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              dislikedMovies: this.state.dislikedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
               this.position.setValue({ x: 0, y: 0})
             })
@@ -160,8 +170,6 @@ export default class MovieCard extends React.Component {
     if (!this.state.movies) {
       return null;
     }
-
-    console.log(this.state.currentIndex);
 
     return this.state.movies.map((movie, i) => {
       if(i < this.state.currentIndex){
