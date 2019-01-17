@@ -6,7 +6,8 @@ export default class Api {
     }
 
     async get(path) {
-        return axios.get(`${this.host_string}/${path}`);
+        const result = await axios.get(`${this.host_string}/${path}`);
+        return result.data;
     }
 
     async post(path, data) {

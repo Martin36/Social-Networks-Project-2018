@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo';
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
 import AppNavigator from '../navigation/AppNavigator';
+import FBApi from '../common/fbApi';
 
 
 export default class LoginScreen extends React.Component {
@@ -38,6 +39,12 @@ export default class LoginScreen extends React.Component {
 
     AsyncStorage.setItem('hostString', 'mock')
       .then(() => console.log('Set default host string'));
+
+    const fb = new FBApi(token);
+    fb.getUserLikedMovies()
+      .then(userLikedMovies => {
+        // TODO: From here we can send the movies to the api, the problem is that we are receiving numerical film ids instead of the string ones
+      });
   }
 
   render() {

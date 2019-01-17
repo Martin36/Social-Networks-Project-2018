@@ -5,8 +5,15 @@ export default class FBApi {
         this.token = token;
     }
 
-    getUserInfo() {
-        console.log('Getting user info from facebook.');
-        return [];
+    async getUserInfo() {
+        const result = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${this.token}`);
+
+        return result.data;
+    }
+
+    async getUserLikedMovies() {
+        const result = await axios.get(`https://graph.facebook.com/me?fields=movies&access_token=${this.token}`);
+
+        return result.data;
     }
 }

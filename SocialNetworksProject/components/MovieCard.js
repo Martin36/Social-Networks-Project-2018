@@ -83,9 +83,9 @@ export default class MovieCard extends React.Component {
       console.log('User token is ', userToken);
 
       console.log('Aquiring facebook info...');
-      const result = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${userToken}`);
+      const fb = new FBApi(userToken);
+      const { email } = await fb.getUserInfo();
       const hostString = await AsyncStorage.getItem('hostString');
-      const { email } = result.data;
 
       console.log('Email is ', email);
 
