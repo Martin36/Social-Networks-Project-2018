@@ -19,6 +19,7 @@ const iconSize = 120;
 const minNrOfMovies = 5;
 //The amount of movies to cache before the API should be updated
 const nrOfCachedMovied = 5;
+const nrOfMoviesToFetch = 20;
 let api;
 
 export default class MovieCard extends React.Component {
@@ -107,7 +108,7 @@ export default class MovieCard extends React.Component {
       api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
 
       console.log(`Getting recommendations for user ${email}.`);
-      return api.getRecommendations(email, 0, 10);
+      return api.getRecommendations(email, 0, nrOfMoviesToFetch);
     }
     catch (e) {
       console.log('Error happened :(');
@@ -129,6 +130,11 @@ export default class MovieCard extends React.Component {
         dislikes: this.state.dislikedMovies,
       };
       console.log(data);
+      //Resett liked/disliked movies
+      this.setState({...this.state,
+        likedMovies: [],
+        dislikedMovies: [],
+      }, () => console.log("Liked/disliked movies resetted"))
 
       return api.addMovie(email, data);
     }
@@ -184,6 +190,16 @@ export default class MovieCard extends React.Component {
               dislikedMovies: this.state.dislikedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
             },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
