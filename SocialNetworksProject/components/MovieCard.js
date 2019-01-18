@@ -15,7 +15,11 @@ import FBApi from '../common/fbApi';
 import axios from 'axios';
 
 const iconSize = 120;
-
+//Fetch new movies when there is only this amount left
+const minNrOfMovies = 5;
+//The amount of movies to cache before the API should be updated
+const nrOfCachedMovied = 5;
+let api;
 
 export default class MovieCard extends React.Component {
 
@@ -100,7 +104,7 @@ export default class MovieCard extends React.Component {
 
       console.log('Email is ', email);
 
-      const api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
+      api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
 
       console.log(`Getting recommendations for user ${email}.`);
       return api.getRecommendations(email, 0, 10);
@@ -109,6 +113,28 @@ export default class MovieCard extends React.Component {
       console.log('Error happened :(');
       console.log(e);
       return [];
+    }
+  }
+
+  async postCachedMovies(data) {
+    try {
+      console.log("Posting swiped movies to API");
+
+      const email = 'l@gmail.com';
+      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
+
+      //Pass the movies to the algorithm
+      const data = {
+        likes: this.state.likedMovies,
+        dislikes: this.state.dislikedMovies,
+      };
+      console.log(data);
+
+      return api.addMovie(email, data);
+    }
+    catch (e) {
+      console.log(e);
+      throw e;
     }
   }
 
@@ -134,6 +160,16 @@ export default class MovieCard extends React.Component {
               likedMovies: this.state.likedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
             },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
