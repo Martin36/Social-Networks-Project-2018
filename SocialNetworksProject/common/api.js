@@ -69,7 +69,6 @@ export class MockApi extends Api {
     constructor(host_string) {
         super(host_string);
     }
-
     async getRecommendations(userId, start, n) {
         return new Promise((resolve, reject) => {
             const movies = [

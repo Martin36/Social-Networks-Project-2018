@@ -13,6 +13,12 @@ import Api, { MockApi } from '../common/api';
 import FBApi from '../common/fbApi';
 
 const iconSize = 120;
+//Fetch new movies when there is only this amount left
+const minNrOfMovies = 5;
+//The amount of movies to cache before the API should be updated
+const nrOfCachedMovied = 5;
+const nrOfMoviesToFetch = 20;
+let api;
 
 export default class MovieCard extends React.Component {
 
@@ -25,6 +31,8 @@ export default class MovieCard extends React.Component {
       movies: [],
       fbApi: null,
       mainApi: null,
+      likedMovies: [],
+      dislikedMovies: [],
     }
 
     this.updateMovieList = this.updateMovieList.bind(this);
@@ -66,6 +74,10 @@ export default class MovieCard extends React.Component {
   }
 
   updateMovieList(movies) {
+    //Create list of movies
+    movies = movies.movies.map((movie) => {
+      return movie.movie;
+    });
     this.setState({
       ...this.state,
       movies: this.state.movies.concat(movies)
@@ -104,16 +116,48 @@ export default class MovieCard extends React.Component {
       const { fbApi, api } = await this.getApis();
 
       console.log('Resolving user email...');
-      const { email } = await fbApi.getUserInfo();
+
+
+      let { email } = await fbApi.getUserInfo();
       console.log('Email is ', email);
 
+      // TESTING: Override the email
+      email = 'l@gmail.com';
+
       console.log(`Getting recommendations for user ${email}.`);
-      return api.getRecommendations(email, 0, 10);
+      return api.getRecommendations(email, 0, nrOfMoviesToFetch);
     }
     catch (e) {
       console.log('Error happened :(');
       console.log(e);
       return [];
+    }
+  }
+
+  async postCachedMovies(data) {
+    try {
+      console.log("Posting swiped movies to API");
+
+      const email = 'l@gmail.com';
+      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
+
+      //Pass the movies to the algorithm
+      const data = {
+        likes: this.state.likedMovies,
+        dislikes: this.state.dislikedMovies,
+      };
+      console.log(data);
+      //Resett liked/disliked movies
+      this.setState({...this.state,
+        likedMovies: [],
+        dislikedMovies: [],
+      }, () => console.log("Liked/disliked movies resetted"))
+
+      return api.addMovie(email, data);
+    }
+    catch (e) {
+      console.log(e);
+      throw e;
     }
   }
 
@@ -129,22 +173,50 @@ export default class MovieCard extends React.Component {
         this.position.setValue({ x: gestureState.dx, y: gestureState.dy })
       },
       onPanResponderRelease: (evt, gestureState) => {
+        //User liked the movie
         if(gestureState.dx > 120) {
           Animated.spring(this.position, {
             toValue: { x: Layout.window.width + 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              likedMovies: this.state.likedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
         }
+        //User disliked the movie
         else if(gestureState.dx < -120) {
           Animated.spring(this.position, {
             toValue: { x: -Layout.window.width - 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              dislikedMovies: this.state.dislikedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
@@ -171,7 +243,7 @@ export default class MovieCard extends React.Component {
     const moviesToRender = this.state.movies
       .filter((_, i) => i >= this.state.currentIndex);
 
-      return moviesToRender.map((movie, i) => {
+    return this.state.movies.map((movie, i) => {
       if(i == this.state.currentIndex) {
         return (
           <Animated.View
@@ -235,7 +307,7 @@ export default class MovieCard extends React.Component {
   }
 
   render() {
-    if (!this.state.movies) {
+    if (this.state.movies.length === 0) {
       return <View>
         <Text>"Loading movies..."</Text>
       </View>;
