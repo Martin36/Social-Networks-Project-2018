@@ -10,7 +10,6 @@ import { Icon, LinearGradient } from 'expo';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 import Api, { MockApi } from '../common/api';
-import { GlobalState } from '../common/state';
 import FBApi from '../common/fbApi';
 
 const iconSize = 120;
@@ -21,8 +20,8 @@ const nrOfCachedMovied = 5;
 const nrOfMoviesToFetch = 20;
 const ipAddress = '192.168.1.12';
 const port = '8080';
-let api;
-let fb;
+// let api;
+// let fb;
 
 export default class MovieCard extends React.Component {
 
@@ -33,11 +32,14 @@ export default class MovieCard extends React.Component {
     this.state = {
       currentIndex: 0,
       movies: [],
+      fbApi: null,
+      mainApi: null,
       likedMovies: [],
       dislikedMovies: [],
     }
 
     this.updateMovieList = this.updateMovieList.bind(this);
+    this.updateApis = this.updateApis.bind(this);
 
     this.rotate = this.position.x.interpolate({
       inputRange: [-Layout.window.width/2, 0, Layout.window.width/2],
@@ -76,9 +78,9 @@ export default class MovieCard extends React.Component {
 
   updateMovieList(movies) {
     //Create list of movies
-    movies = movies.movies.map((movie) => {
-      return movie.movie;
-    });
+    console.log(movies);
+    movies = movies.movies.map((movie) => movie.movie);
+
     this.setState({
       ...this.state,
       movies: this.state.movies.concat(movies)
@@ -89,25 +91,46 @@ export default class MovieCard extends React.Component {
     this.props.navigation.navigate("Movie", movie);
   }
 
+  updateApis(fbApi, mainApi) {
+    this.setState({
+      ...this.state,
+      fbApi, mainApi
+    })
+  }
+
+  async getApis() {
+    if (!this.state.fbApi || this.state.mainApi) {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const apiHostString = await AsyncStorage.getItem('hostString');
+
+      this.updateApis(
+        new FBApi(userToken),
+        apiHostString === "mock" ? new MockApi('') : new Api(apiHostString)
+      );
+    }
+
+    return {fbApi: this.state.fbApi, api: this.state.mainApi};
+  }
+
   async getNextBatchOfMovies() {
     try
     {
-      console.log("Getting next batch of movies.");
-      const userToken = await AsyncStorage.getItem('userToken');
-      console.log('User token is ', userToken);
+      console.log('Resolving the api connections...');
+      const { fbApi, api } = await this.getApis();
 
       console.log('Aquiring facebook info...');
-      fb = new FBApi(userToken);
+      //fb = new FBApi(userToken);
 
       //Example call: http://192.168.5.9:8080/MovieRecommendation/l@gmail.com/10/10
       // const email = 'l@gmail.com';
       const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
-      const { email } = await fb.getUserInfo();
       // const hostString = await AsyncStorage.getItem('hostString');
 
+      let { email } = await fbApi.getUserInfo();
       console.log('Email is ', email);
 
-      api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
+      // TESTING: Override the email
+      //email = 'l@gmail.com';
 
       console.log(`Getting recommendations for user ${email}.`);
       return api.getRecommendations(email, 0, nrOfMoviesToFetch);
@@ -122,9 +145,10 @@ export default class MovieCard extends React.Component {
   async postCachedMovies(data) {
     try {
       console.log("Posting swiped movies to API");
+      const { fbApi, api } = await this.getApis();
 
       // const email = 'l@gmail.com';
-      const { email } = await fb.getUserInfo();
+      const { email } = await fbApi.getUserInfo();
       const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
 
       //Pass the movies to the algorithm
@@ -132,6 +156,7 @@ export default class MovieCard extends React.Component {
         likes: this.state.likedMovies,
         dislikes: this.state.dislikedMovies,
       };
+
       console.log(data);
       //Resett liked/disliked movies
       this.setState({...this.state,
@@ -139,6 +164,7 @@ export default class MovieCard extends React.Component {
         dislikedMovies: [],
       }, () => console.log("Liked/disliked movies resetted"))
 
+      //const { api } = await this.getApis();
       return api.addMovie(email, data);
     }
     catch (e) {
@@ -226,11 +252,11 @@ export default class MovieCard extends React.Component {
       return null;
     }
 
+    const moviesToRender = this.state.movies
+      .filter((_, i) => i >= this.state.currentIndex);
+
     return this.state.movies.map((movie, i) => {
-      if(i < this.state.currentIndex){
-        return null;
-      }
-      else if(i == this.state.currentIndex) {
+      if(i == this.state.currentIndex) {
         return (
           <Animated.View
             {...this.PanResponder.panHandlers}

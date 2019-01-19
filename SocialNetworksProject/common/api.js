@@ -1,17 +1,51 @@
 import axios from 'axios';
 
+function delay(ms) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 export default class Api {
     constructor(host_string) {
         this.host_string = host_string;
+
+        this.currentQueueNumber = 0
+        this.trailingQueueNumber = 0
+    }
+
+    getQueueNumber() {
+        return this.trailingQueueNumber++;
+    }
+
+    async queueTurn() {
+        const q = this.getQueueNumber();
+
+        while (q !== this.currentQueueNumber) {
+            await delay(250);
+        }
+
+        return;
+    }
+
+    async doInQueue(act) {
+        await this.queueTurn();
+
+        const result = await act();
+
+        this.currentQueueNumber += 1;
+
+        return result;
     }
 
     async get(path) {
-        const result = await axios.get(`${this.host_string}/${path}`);
+        const act = async () => await axios.get(`${this.host_string}/${path}`);
+        const result = await this.doInQueue(act);
         return result.data;
     }
 
     async post(path, data) {
-        return axios.post(`${this.host_string}/${path}`, data);
+        const act = async () => axios.post(`${this.host_string}/${path}`, data);
+        const result = await this.doInQueue(act);
+        return result;
     }
 
     async getUser(id) {

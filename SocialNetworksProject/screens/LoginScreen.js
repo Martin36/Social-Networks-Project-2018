@@ -37,7 +37,7 @@ export default class LoginScreen extends React.Component {
         console.log('Saved user token to async storage');
       });
 
-    AsyncStorage.setItem('hostString', 'mock')
+    AsyncStorage.setItem('hostString', '192.168.5.9:8080')
       .then(() => console.log('Set default host string'));
 
     const fb = new FBApi(token);
