@@ -10,9 +10,7 @@ import { Icon, LinearGradient } from 'expo';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 import Api, { MockApi } from '../common/api';
-import { GlobalState } from '../common/state';
 import FBApi from '../common/fbApi';
-import axios from 'axios';
 
 const iconSize = 120;
 
@@ -25,9 +23,12 @@ export default class MovieCard extends React.Component {
     this.state = {
       currentIndex: 0,
       movies: [],
+      fbApi: null,
+      mainApi: null,
     }
 
     this.updateMovieList = this.updateMovieList.bind(this);
+    this.updateApis = this.updateApis.bind(this);
 
     this.rotate = this.position.x.interpolate({
       inputRange: [-Layout.window.width/2, 0, Layout.window.width/2],
@@ -75,21 +76,36 @@ export default class MovieCard extends React.Component {
     this.props.navigation.navigate("Movie", movie);
   }
 
+  updateApis(fbApi, mainApi) {
+    this.setState({
+      ...this.state,
+      fbApi, mainApi
+    })
+  }
+
+  async getApis() {
+    if (!this.state.fbApi || this.state.mainApi) {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const apiHostString = await AsyncStorage.getItem('hostString');
+
+      this.updateApis(
+        new FBApi(userToken),
+        apiHostString === "mock" ? new MockApi('') : new Api(apiHostString)
+      );
+    }
+
+    return {fbApi: this.state.fbApi, api: this.state.mainApi};
+  }
+
   async getNextBatchOfMovies() {
     try
     {
-      console.log("Getting next batch of movies.");
-      const userToken = await AsyncStorage.getItem('userToken');
-      console.log('User token is ', userToken);
+      console.log('Resolving the api connections...');
+      const { fbApi, api } = await this.getApis();
 
-      console.log('Aquiring facebook info...');
-      const fb = new FBApi(userToken);
-      const { email } = await fb.getUserInfo();
-      const hostString = await AsyncStorage.getItem('hostString');
-
+      console.log('Resolving user email...');
+      const { email } = await fbApi.getUserInfo();
       console.log('Email is ', email);
-
-      const api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
 
       console.log(`Getting recommendations for user ${email}.`);
       return api.getRecommendations(email, 0, 10);
@@ -152,8 +168,10 @@ export default class MovieCard extends React.Component {
       return null;
     }
 
-    const moviesToRender = this.state.movies.filter((_, i) => i >= this.state.currentIndex);
-    return moviesToRender.map((movie, i) => {
+    const moviesToRender = this.state.movies
+      .filter((_, i) => i >= this.state.currentIndex);
+
+      return moviesToRender.map((movie, i) => {
       if(i == this.state.currentIndex) {
         return (
           <Animated.View
