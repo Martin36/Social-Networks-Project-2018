@@ -12,7 +12,6 @@ import Colors from '../constants/Colors';
 import Api, { MockApi } from '../common/api';
 import { GlobalState } from '../common/state';
 import FBApi from '../common/fbApi';
-import axios from 'axios';
 
 const iconSize = 120;
 //Fetch new movies when there is only this amount left
@@ -20,7 +19,10 @@ const minNrOfMovies = 5;
 //The amount of movies to cache before the API should be updated
 const nrOfCachedMovied = 5;
 const nrOfMoviesToFetch = 20;
+const ipAddress = '192.168.1.12';
+const port = '8080';
 let api;
+let fb;
 
 export default class MovieCard extends React.Component {
 
@@ -95,12 +97,12 @@ export default class MovieCard extends React.Component {
       console.log('User token is ', userToken);
 
       console.log('Aquiring facebook info...');
-      const fb = new FBApi(userToken);
+      fb = new FBApi(userToken);
 
       //Example call: http://192.168.5.9:8080/MovieRecommendation/l@gmail.com/10/10
-      const email = 'l@gmail.com';
-      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
-      // const { email } = await fb.getUserInfo();
+      // const email = 'l@gmail.com';
+      const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
+      const { email } = await fb.getUserInfo();
       // const hostString = await AsyncStorage.getItem('hostString');
 
       console.log('Email is ', email);
@@ -121,8 +123,9 @@ export default class MovieCard extends React.Component {
     try {
       console.log("Posting swiped movies to API");
 
-      const email = 'l@gmail.com';
-      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
+      // const email = 'l@gmail.com';
+      const { email } = await fb.getUserInfo();
+      const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
 
       //Pass the movies to the algorithm
       const data = {

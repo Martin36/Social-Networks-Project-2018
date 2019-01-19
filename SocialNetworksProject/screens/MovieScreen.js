@@ -57,23 +57,21 @@ export default class MovieScreen extends React.Component {
             <Text style={{fontWeight: 'bold'}}>Summary: </Text>
             {description}
           </Text>
-
-          <View style={styles.iconContainer}>
-            <Icon.Ionicons
-              name={Platform.OS === 'ios' ? heartIconIos : heartIconAndroid}
-              size={iconSize}
-              style={styles.heartIcon}
-              onPress={() => this.setState((state) => {
-                //TODO: add/remove this movie from the users liked movies
-                return {liked: !state.liked}
-              })}
-            />
-          </View>
-
         </View>
       </View>
     )
   }
+  // <View style={styles.iconContainer}>
+  //   <Icon.Ionicons
+  //     name={Platform.OS === 'ios' ? heartIconIos : heartIconAndroid}
+  //     size={iconSize}
+  //     style={styles.heartIcon}
+  //     onPress={() => this.setState((state) => {
+  //       //TODO: add/remove this movie from the users liked movies
+  //       return {liked: !state.liked}
+  //     })}
+  //   />
+  // </View>
 }
 
 const styles = StyleSheet.create({

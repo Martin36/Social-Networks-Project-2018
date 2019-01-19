@@ -6,7 +6,7 @@ export default class FBApi {
     }
 
     async getUserInfo() {
-        const result = await axios.get(`https://graph.facebook.com/me?fields=email&access_token=${this.token}`);
+        const result = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,movies.limit(50)&access_token=${this.token}`);
 
         return result.data;
     }
