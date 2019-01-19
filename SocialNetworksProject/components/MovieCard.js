@@ -18,7 +18,6 @@ const minNrOfMovies = 5;
 //The amount of movies to cache before the API should be updated
 const nrOfCachedMovied = 5;
 const nrOfMoviesToFetch = 20;
-let api;
 
 export default class MovieCard extends React.Component {
 
@@ -75,9 +74,9 @@ export default class MovieCard extends React.Component {
 
   updateMovieList(movies) {
     //Create list of movies
-    movies = movies.movies.map((movie) => {
-      return movie.movie;
-    });
+    console.log(movies);
+    movies = movies.movies.map((movie) => movie.movie);
+
     this.setState({
       ...this.state,
       movies: this.state.movies.concat(movies)
@@ -139,13 +138,13 @@ export default class MovieCard extends React.Component {
       console.log("Posting swiped movies to API");
 
       const email = 'l@gmail.com';
-      const hostString = 'http://192.168.5.9:8080'; //Change this to your IP
 
       //Pass the movies to the algorithm
       const data = {
         likes: this.state.likedMovies,
         dislikes: this.state.dislikedMovies,
       };
+
       console.log(data);
       //Resett liked/disliked movies
       this.setState({...this.state,
@@ -153,6 +152,7 @@ export default class MovieCard extends React.Component {
         dislikedMovies: [],
       }, () => console.log("Liked/disliked movies resetted"))
 
+      const { api } = await this.getApis();
       return api.addMovie(email, data);
     }
     catch (e) {
