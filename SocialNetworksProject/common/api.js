@@ -37,26 +37,20 @@ export default class Api {
     }
 
     async get(path) {
-        // const act = async () => await axios.get(`${this.host_string}/${path}`);
-        // const result = await this.doInQueue(act);
-        console.log(`Query string: ${this.host_string}/${path}`)
-        const result = await axios.get(`http://${this.host_string}/${path}`);
-        // axios.get(`http://${this.host_string}/${path}`)
-        //   .then((result) => {
-        //     console.log("Results:", result.data);
-        //     return result.data;
-        //   })
-        //   .catch((error) => {
-        //     console.log(error);
-        //   })
+        const act = async () => {
+            console.log(`Making an api get call to ${path}`);
+            return await axios.get(`${this.host_string}/${path}`);
+        };
+        const result = await this.doInQueue(act);
         return result.data;
     }
 
     async post(path, data) {
-        // const act = async () => axios.post(`${this.host_string}/${path}`, data);
-        // const result = await this.doInQueue(act);
-        console.log(`Query string: ${this.host_string}/${path}`)
-        const result = await axios.post(`http://${this.host_string}/${path}`, data);
+        const act = async () => {
+            console.log(`Making an api post call to ${path} with data: ${data}`);
+            return await axios.post(`${this.host_string}/${path}`, data);
+        };
+        const result = await this.doInQueue(act);
         return result;
     }
 
