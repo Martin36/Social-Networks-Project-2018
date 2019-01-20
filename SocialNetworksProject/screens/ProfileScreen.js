@@ -33,7 +33,7 @@ export default class ProfileScreen extends React.Component {
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
-        console.log("willFocus", payload);
+        //console.log("willFocus", payload);
         //Means that we are navigating with the tab bar
         if(payload.action.type === "Navigation/NAVIGATE"){
           this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
@@ -101,8 +101,6 @@ export default class ProfileScreen extends React.Component {
 
     if(!this.state.user)
       return null;
-
-    console.log(this.state.user);
 
     return (
       <View style={styles.container}>
