@@ -18,10 +18,6 @@ const minNrOfMovies = 5;
 //The amount of movies to cache before the API should be updated
 const nrOfCachedMovied = 5;
 const nrOfMoviesToFetch = 20;
-const ipAddress = '192.168.1.12';
-const port = '8080';
-// let api;
-// let fb;
 
 export default class MovieCard extends React.Component {
 
@@ -78,7 +74,6 @@ export default class MovieCard extends React.Component {
 
   updateMovieList(movies) {
     //Create list of movies
-    console.log(movies);
     movies = movies.movies.map((movie) => movie.movie);
 
     this.setState({
@@ -148,7 +143,7 @@ export default class MovieCard extends React.Component {
         dislikes: this.state.dislikedMovies,
       };
 
-      console.log(data);
+      //console.log(data);
       //Resett liked/disliked movies
       this.setState({...this.state,
         likedMovies: [],

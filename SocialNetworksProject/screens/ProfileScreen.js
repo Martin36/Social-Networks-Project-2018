@@ -84,14 +84,12 @@ export default class ProfileScreen extends React.Component {
     try{
       console.log("Getting user info....");
       const userToken = await AsyncStorage.getItem('userToken');
-      console.log('User token is ', userToken);
 
       console.log('Aquiring facebook info...');
       const fb = new FBApi(userToken);
 
       const userInfo = await fb.getUserInfo();
       userInfo.movies = userInfo.movies.data;
-      console.log('User info: ', userInfo);
 
       const hostString = await AsyncStorage.getItem('hostString');
       api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
@@ -119,6 +117,7 @@ export default class ProfileScreen extends React.Component {
   }
 
   render() {
+
     if(!this.state.user)
       return null;
 

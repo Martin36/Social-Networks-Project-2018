@@ -53,8 +53,10 @@ export default class Api {
     }
 
     async post(path, data) {
-        const act = async () => axios.post(`${this.host_string}/${path}`, data);
-        const result = await this.doInQueue(act);
+        // const act = async () => axios.post(`${this.host_string}/${path}`, data);
+        // const result = await this.doInQueue(act);
+        console.log(`Query string: ${this.host_string}/${path}`)
+        const result = await axios.post(`http://${this.host_string}/${path}`, data);
         return result;
     }
 
