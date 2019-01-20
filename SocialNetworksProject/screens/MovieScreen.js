@@ -32,8 +32,8 @@ export default class MovieScreen extends React.Component {
     const title = navigation.getParam('title');
     const image_url = navigation.getParam('image_url');
     const description = navigation.getParam('description');
-    const genres = navigation.getParam('genres', ['Unknown']);
-    const releaseDate = navigation.getParam('releaseDate');
+    const year = navigation.getParam('year');
+    const runtime = navigation.getParam('runtime');
 
     const heartIconAndroid = this.state.liked ? 'md-heart' : 'md-heart-empty';
     const heartIconIos = this.state.liked ? 'ios-heart' : 'ios-heart-empty';
@@ -46,12 +46,12 @@ export default class MovieScreen extends React.Component {
         <View style={styles.infoContainer}>
           <Text style={styles.titleText}>{title}</Text>
           <Text style={styles.text}>
-            <Text style={{fontWeight: 'bold'}}>Genres: </Text>
-            {genres.join(', ')}
+            <Text style={{fontWeight: 'bold'}}>Release Year: </Text>
+            {year}
           </Text>
           <Text style={styles.text}>
-            <Text style={{fontWeight: 'bold'}}>Release Date: </Text>
-            {releaseDate}
+            <Text style={{fontWeight: 'bold'}}>Runtime: </Text>
+            {runtime}
           </Text>
           <Text style={styles.summary}>
             <Text style={{fontWeight: 'bold'}}>Summary: </Text>

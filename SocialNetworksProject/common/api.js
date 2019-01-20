@@ -37,8 +37,18 @@ export default class Api {
     }
 
     async get(path) {
-        const act = async () => await axios.get(`${this.host_string}/${path}`);
-        const result = await this.doInQueue(act);
+        // const act = async () => await axios.get(`${this.host_string}/${path}`);
+        // const result = await this.doInQueue(act);
+        console.log(`Query string: ${this.host_string}/${path}`)
+        const result = await axios.get(`http://${this.host_string}/${path}`);
+        // axios.get(`http://${this.host_string}/${path}`)
+        //   .then((result) => {
+        //     console.log("Results:", result.data);
+        //     return result.data;
+        //   })
+        //   .catch((error) => {
+        //     console.log(error);
+        //   })
         return result.data;
     }
 

@@ -58,7 +58,7 @@ export default class LoginScreen extends React.Component {
           colors={Colors.gradientColors}
           style={styles.bgGradient}>
           <View style={styles.textContainer}>
-            <Text style={styles.headerText}>Movie Finder</Text>
+            <Text style={styles.headerText}>Movinder</Text>
             <Text style={styles.subHeaderText}>We find the perfect movie for you, Log in with Facebook to start the experience</Text>
           </View>
           <FbLoginButton onLogin={this.onLogin} />

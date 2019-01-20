@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AsyncStorage,
+  AsyncStorage, ScrollView,
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
   Platform, ImageBackground, TouchableOpacity
@@ -13,7 +13,6 @@ import FBApi from '../common/fbApi';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 
-const hostString = "http://192.168.1.12:8080";
 // const user = {
 //   id: "0",
 //   name: "John Doe",
@@ -58,27 +57,28 @@ export default class ProfileScreen extends React.Component {
     super(props);
 
     this.state = {
-      user: {},
+      user: null,
+      movies: null,
     }
 
   }
 
-  // renderMovies = () => {
-  //   return user.likedMovies.map((movie, i) => {
-  //     return (
-  //       <TouchableOpacity key={movie.id} style={styles.listItem}
-  //         onPress={() => this.props.navigation.navigate("Movie", movie)}>
-  //         <Image style={styles.movieImage} source={movie.uri} />
-  //         <Text style={styles.movieTitle}>{movie.title}</Text>
-  //         <Icon.Ionicons
-  //           name={Platform.OS === 'ios' ? 'ios-arrow-forward' : 'md-arrow-forward'}
-  //           size={iconSize}
-  //           style={styles.arrowIcon}
-  //           />
-  //       </TouchableOpacity>
-  //     )
-  //   })
-  // }
+  renderMovies = () => {
+    return this.state.movies.map((movie, i) => {
+      return (
+        <TouchableOpacity key={i} style={styles.listItem}
+          onPress={() => this.props.navigation.navigate("Movie", movie)}>
+          <Image style={styles.movieImage} source={{uri: movie.image_url}} />
+          <Text style={styles.movieTitle}>{movie.title}</Text>
+          <Icon.Ionicons
+            name={Platform.OS === 'ios' ? 'ios-arrow-forward' : 'md-arrow-forward'}
+            size={iconSize}
+            style={styles.arrowIcon}
+            />
+        </TouchableOpacity>
+      )
+    })
+  }
 
   async getUserInfo () {
     try{
@@ -93,6 +93,7 @@ export default class ProfileScreen extends React.Component {
       userInfo.movies = userInfo.movies.data;
       console.log('User info: ', userInfo);
 
+      const hostString = await AsyncStorage.getItem('hostString');
       api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
       //Get user from Api
       let user = await api.getUser(userInfo.email);
@@ -113,19 +114,24 @@ export default class ProfileScreen extends React.Component {
 
   componentWillMount() {
 
-    this.getUserInfo().then((user) => this.setState({user: user}));
+    this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
 
   }
 
   render() {
+    if(!this.state.user)
+      return null;
+
+    console.log(this.state.user);
+
     return (
       <View style={styles.container}>
         <Image style={styles.profilePic} source={profileUri} />
         <Text style={styles.nameText}>{this.state.user.name}</Text>
-        <View style={styles.moviesList}>
-          <Text style={styles.listHeader}>Liked Movies</Text>
-          {/*this.renderMovies()*/}
-        </View>
+        <Text style={styles.listHeader}>Liked Movies</Text>
+        <ScrollView>
+          {this.renderMovies()}
+        </ScrollView>
       </View>
     )
   }
@@ -137,7 +143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.backgroundColor,
     paddingTop: 50,
-
+    height: '100%',
   },
   profilePic: {
     width: 100,
@@ -163,7 +169,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   listItem: {
-    height: 50,
+    height: 100,
     width: '100%',
     flex: 1,
     flexDirection: 'row',

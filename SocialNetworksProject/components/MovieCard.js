@@ -118,14 +118,6 @@ export default class MovieCard extends React.Component {
       console.log('Resolving the api connections...');
       const { fbApi, api } = await this.getApis();
 
-      console.log('Aquiring facebook info...');
-      //fb = new FBApi(userToken);
-
-      //Example call: http://192.168.5.9:8080/MovieRecommendation/l@gmail.com/10/10
-      // const email = 'l@gmail.com';
-      const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
-      // const hostString = await AsyncStorage.getItem('hostString');
-
       let { email } = await fbApi.getUserInfo();
       console.log('Email is ', email);
 
@@ -149,7 +141,6 @@ export default class MovieCard extends React.Component {
 
       // const email = 'l@gmail.com';
       const { email } = await fbApi.getUserInfo();
-      const hostString = `http://${ipAddress}:${port}`; //Change this to your IP
 
       //Pass the movies to the algorithm
       const data = {
@@ -252,11 +243,13 @@ export default class MovieCard extends React.Component {
       return null;
     }
 
-    const moviesToRender = this.state.movies
-      .filter((_, i) => i >= this.state.currentIndex);
+
 
     return this.state.movies.map((movie, i) => {
-      if(i == this.state.currentIndex) {
+      if(i < this.state.currentIndex){
+        return null;
+      }
+      else if(i == this.state.currentIndex) {
         return (
           <Animated.View
             {...this.PanResponder.panHandlers}
