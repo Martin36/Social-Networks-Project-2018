@@ -61,6 +61,15 @@ export default class ProfileScreen extends React.Component {
       movies: null,
     }
 
+    // Used for knowing when this screen is navigated to
+    const didBlurSubscription = this.props.navigation.addListener(
+      'willFocus',
+      payload => {
+        this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
+        console.log('At Profile screen');
+      }
+    );
+
   }
 
   renderMovies = () => {

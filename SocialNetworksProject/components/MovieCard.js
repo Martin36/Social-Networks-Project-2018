@@ -70,6 +70,17 @@ export default class MovieCard extends React.Component {
       outputRange: [1, 0.8, 1],
       extrapolate: 'clamp'
     });
+
+    const willBlurSubscription = this.props.navigation.addListener(
+      'willBlur',
+      payload => {
+        if(this.state.likedMovies.length !== 0 || this.state.dislikedMovies.length !== 0){
+          this.postCachedMovies();
+        }
+        console.log('Leaving Recommendation screen');
+      }
+    );
+
   }
 
   updateMovieList(movies) {
@@ -129,7 +140,7 @@ export default class MovieCard extends React.Component {
     }
   }
 
-  async postCachedMovies(data) {
+  async postCachedMovies() {
     try {
       console.log("Posting swiped movies to API");
       const { fbApi, api } = await this.getApis();
