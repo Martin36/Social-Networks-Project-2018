@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AsyncStorage,
   Text, View, Animated,
   StyleSheet, Image, PanResponder,
   Platform, ImageBackground, TouchableHighlight,
@@ -8,27 +9,33 @@ import { Icon, LinearGradient } from 'expo';
 
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
-
-var allMovies = require('../assets/data/dump_with_images.json');
-// Take first 10 movies
-movies = allMovies.slice(0, 10);
-// Add id to movies
-for(let i = 0; i < movies.length; i++)
-  movies[i].id = i;
+import Api, { MockApi } from '../common/api';
+import FBApi from '../common/fbApi';
 
 const iconSize = 120;
+//Fetch new movies when there is only this amount left
+const minNrOfMovies = 5;
+//The amount of movies to cache before the API should be updated
+const nrOfCachedMovied = 5;
+const nrOfMoviesToFetch = 20;
 
 export default class MovieCard extends React.Component {
 
   constructor(props){
     super(props);
 
-    //console.log(this.props);
-
     this.position = new Animated.ValueXY();
     this.state = {
-      currentIndex: 0
+      currentIndex: 0,
+      movies: [],
+      fbApi: null,
+      mainApi: null,
+      likedMovies: [],
+      dislikedMovies: [],
     }
+
+    this.updateMovieList = this.updateMovieList.bind(this);
+    this.updateApis = this.updateApis.bind(this);
 
     this.rotate = this.position.x.interpolate({
       inputRange: [-Layout.window.width/2, 0, Layout.window.width/2],
@@ -63,13 +70,108 @@ export default class MovieCard extends React.Component {
       outputRange: [1, 0.8, 1],
       extrapolate: 'clamp'
     });
+
+    const willBlurSubscription = this.props.navigation.addListener(
+      'willBlur',
+      payload => {
+        if(this.state.likedMovies.length !== 0 || this.state.dislikedMovies.length !== 0){
+          this.postCachedMovies();
+        }
+        console.log('Leaving Recommendation screen');
+      }
+    );
+
+  }
+
+  updateMovieList(movies) {
+    //Create list of movies
+    movies = movies.movies.map((movie) => movie.movie);
+
+    this.setState({
+      ...this.state,
+      movies: this.state.movies.concat(movies)
+    });
   }
 
   redirectToMovieScreen = (movie) => {
     this.props.navigation.navigate("Movie", movie);
   }
 
+  updateApis(fbApi, mainApi) {
+    this.setState({
+      ...this.state,
+      fbApi, mainApi
+    })
+  }
+
+  async getApis() {
+    if (!this.state.fbApi || this.state.mainApi) {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const apiHostString = await AsyncStorage.getItem('hostString');
+
+      this.updateApis(
+        new FBApi(userToken),
+        apiHostString === "mock" ? new MockApi('') : new Api(apiHostString)
+      );
+    }
+
+    return {fbApi: this.state.fbApi, api: this.state.mainApi};
+  }
+
+  async getNextBatchOfMovies() {
+    try
+    {
+      console.log('Resolving the api connections...');
+      const { fbApi, api } = await this.getApis();
+
+      let { email } = await fbApi.getUserInfo();
+      console.log('Email is ', email);
+
+      console.log(`Getting recommendations for user ${email}.`);
+      return api.getRecommendations(email, 0, nrOfMoviesToFetch);
+    }
+    catch (e) {
+      console.log('Error happened :(');
+      console.log(e);
+      return [];
+    }
+  }
+
+  async postCachedMovies() {
+    try {
+      console.log("Posting swiped movies to API");
+      const { fbApi, api } = await this.getApis();
+
+      // const email = 'l@gmail.com';
+      const { email } = await fbApi.getUserInfo();
+
+      //Pass the movies to the algorithm
+      const data = {
+        likes: this.state.likedMovies,
+        dislikes: this.state.dislikedMovies,
+      };
+
+      //console.log(data);
+      //Resett liked/disliked movies
+      this.setState({...this.state,
+        likedMovies: [],
+        dislikedMovies: [],
+      }, () => console.log("Liked/disliked movies resetted"))
+
+      //const { api } = await this.getApis();
+      return api.addMovie(email, data);
+    }
+    catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
   componentWillMount() {
+
+    this.getNextBatchOfMovies()
+      .then(this.updateMovieList);
+
     this.PanResponder = PanResponder.create({
 
       onStartShouldSetPanResponder: (evt, gestureState) => true,
@@ -77,30 +179,63 @@ export default class MovieCard extends React.Component {
         this.position.setValue({ x: gestureState.dx, y: gestureState.dy })
       },
       onPanResponderRelease: (evt, gestureState) => {
+        //User liked the movie
         if(gestureState.dx > 120) {
           Animated.spring(this.position, {
             toValue: { x: Layout.window.width + 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              likedMovies: this.state.likedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
         }
+        //User disliked the movie
         else if(gestureState.dx < -120) {
           Animated.spring(this.position, {
             toValue: { x: -Layout.window.width - 100, y: gestureState.dy }
           }).start(() => {
-            this.setState({ currentIndex: this.state.currentIndex + 1},
+            this.setState({
+              currentIndex: this.state.currentIndex + 1,
+              dislikedMovies: this.state.dislikedMovies.concat([{fb_id: this.state.movies[this.state.currentIndex].fb_id}])
+            },
             () => {
+              if(this.state.movies.length - this.state.currentIndex < minNrOfMovies ){
+                //Fetch new movies
+                this.getNextBatchOfMovies()
+                  .then(this.updateMovieList);
+              }
+              let swipedMovies = this.state.likedMovies.length + this.state.dislikedMovies.length;
+              if(swipedMovies >= nrOfCachedMovied){
+                this.postCachedMovies()
+                  .then(() => console.log("Movies posted to API!"));
+              }
               this.position.setValue({ x: 0, y: 0})
             })
           })
         }
         //If the user clicks on the card more information about the movie should be shown
+<<<<<<< HEAD
         else if(gestureState.dx > -10 && gestureState.dx < 10
           && gestureState.dy > -10 && gestureState.dy < 10){
           this.redirectToMovieScreen(movies[this.state.currentIndex]);
+=======
+        else if(gestureState.dx > -10 && gestureState.dx < 10){
+          this.redirectToMovieScreen(this.state.movies[this.state.currentIndex]);
+>>>>>>> api
         }
         else {
           Animated.spring(this.position, {
@@ -113,16 +248,21 @@ export default class MovieCard extends React.Component {
   }
 
   renderMovies = () => {
-    return movies.map((movie, i) => {
+    if (!this.state.movies) {
+      return null;
+    }
 
+
+
+    return this.state.movies.map((movie, i) => {
       if(i < this.state.currentIndex){
         return null;
       }
-      else if(i == this.state.currentIndex){
+      else if(i == this.state.currentIndex) {
         return (
           <Animated.View
             {...this.PanResponder.panHandlers}
-            key={movie.id} style={[
+            key={i} style={[
               this.rotateAndTranslate,
               styles.cardImageContainer,
             ]}>
@@ -163,7 +303,7 @@ export default class MovieCard extends React.Component {
       else{
         return (
           <Animated.View
-            key={movie.id} style={{
+            key={i} style={{
               opacity: this.nextCardOpacity,
               transform: [{ scale: this.nextCardScale}],
               ...styles.cardImageContainer}}>
@@ -181,6 +321,11 @@ export default class MovieCard extends React.Component {
   }
 
   render() {
+    if (this.state.movies.length === 0) {
+      return <View>
+        <Text>"Loading movies..."</Text>
+      </View>;
+    }
     return (
       <View style={styles.cardContainer}>
         <View style={styles.cardHeader}>

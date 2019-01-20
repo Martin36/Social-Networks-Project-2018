@@ -1,10 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View } from 'react-native';
 import FbLoginButton from '../components/FbLoginButton';
 import { LinearGradient } from 'expo';
 
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
+import AppNavigator from '../navigation/AppNavigator';
+import FBApi from '../common/fbApi';
+
 
 export default class LoginScreen extends React.Component {
   static navigationOptions = {
@@ -21,23 +24,42 @@ export default class LoginScreen extends React.Component {
   }
 
   onLogin(wasSuccess, token, err) {
-    //TODO: Here we would need to get the user from our database or
-    //Create new user if they don't exist
+
+    console.log(`Login result: ${wasSuccess} - user token is: ${token}`);
+
     this.setState({
-      isLoggedIn: wasSuccess
+      isLoggedIn: wasSuccess,
+      userToken: token,
     });
+
+    AsyncStorage.setItem('userToken', token)
+      .then(() => {
+        console.log('Saved user token to async storage');
+      });
+
+    AsyncStorage.setItem('hostString', '192.168.5.9:8080')
+      .then(() => console.log('Set default host string'));
+
+    const fb = new FBApi(token);
+    fb.getUserLikedMovies()
+      .then(userLikedMovies => {
+        // TODO: From here we can send the movies to the api, the problem is that we are receiving numerical film ids instead of the string ones
+      });
   }
 
   render() {
+
     if (this.state.isLoggedIn) {
-      return this.props.children;
+
+      return <AppNavigator />;
+
     } else {
       return (
         <LinearGradient
           colors={Colors.gradientColors}
           style={styles.bgGradient}>
           <View style={styles.textContainer}>
-            <Text style={styles.headerText}>Movie Finder</Text>
+            <Text style={styles.headerText}>Movinder</Text>
             <Text style={styles.subHeaderText}>We find the perfect movie for you, Log in with Facebook to start the experience</Text>
           </View>
           <FbLoginButton onLogin={this.onLogin} />

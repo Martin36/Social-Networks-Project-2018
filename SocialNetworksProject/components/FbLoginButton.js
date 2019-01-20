@@ -16,7 +16,13 @@ export default class FBLoginButton extends Component {
   async login() {
     try {
       const {type, token}
-        = await Facebook.logInWithReadPermissionsAsync('694006790992504');
+        = await Facebook.logInWithReadPermissionsAsync('694006790992504', {
+          permissions: [
+            'public_profile',
+            'email',
+            'user_likes',
+          ]
+        });
 
       if (type == 'success') {
         this.props.onLogin(true, token);
