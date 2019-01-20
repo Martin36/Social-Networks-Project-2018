@@ -13,38 +13,6 @@ import FBApi from '../common/fbApi';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
 
-// const user = {
-//   id: "0",
-//   name: "John Doe",
-//   profileUri: require("../assets/images/profile.jpg"),
-//   likedMovies: [
-//     {
-//       id: "0",
-//       title: "Aquaman",
-//       uri: require('../assets/images/aquaman.jpg'),
-//       summary: "Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.",
-//       genres: ["Action", "Adventure", "Fantasy"],
-//       releaseDate: "2018-12-13"
-//     },
-//     {
-//       id: "1",
-//       title: "Bohemian Rhapsody",
-//       uri: require('../assets/images/bohemian-rhapsody.jpg'),
-//       summary: "The story of the legendary rock music band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).",
-//       genres: ["Biography", "Drama", "Music"],
-//       releaseDate: "2018-10-31"
-//     },
-//     {
-//       id: "2",
-//       title: "Robin Hood",
-//       uri: require('../assets/images/robin-hood.jpg'),
-//       summary: "A war-hardened Crusader and his Moorish commander mount an audacious revolt against the corrupt English crown in a thrilling action-adventure packed with gritty battlefield exploits, mind-blowing fight choreography, and a timeless romance.",
-//       genres: ["Action", "Adventure", "Thriller"],
-//       releaseDate: "2018-11-30"
-//     },
-//   ]
-// }
-
 const profileUri = require("../assets/images/profile.jpg");
 const iconSize = 20;
 
@@ -65,7 +33,11 @@ export default class ProfileScreen extends React.Component {
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
-        this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
+        console.log("willFocus", payload);
+        //Means that we are navigating with the tab bar
+        if(payload.action.type === "Navigation/NAVIGATE"){
+          this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
+        }
         console.log('Going to Profile screen');
       }
     );

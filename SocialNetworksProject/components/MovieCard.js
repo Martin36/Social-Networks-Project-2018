@@ -228,14 +228,9 @@ export default class MovieCard extends React.Component {
           })
         }
         //If the user clicks on the card more information about the movie should be shown
-<<<<<<< HEAD
         else if(gestureState.dx > -10 && gestureState.dx < 10
           && gestureState.dy > -10 && gestureState.dy < 10){
           this.redirectToMovieScreen(movies[this.state.currentIndex]);
-=======
-        else if(gestureState.dx > -10 && gestureState.dx < 10){
-          this.redirectToMovieScreen(this.state.movies[this.state.currentIndex]);
->>>>>>> api
         }
         else {
           Animated.spring(this.position, {
