@@ -62,11 +62,11 @@ export default class ProfileScreen extends React.Component {
     }
 
     // Used for knowing when this screen is navigated to
-    const didBlurSubscription = this.props.navigation.addListener(
+    const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
         this.getUserInfo().then((data) => this.setState({user: data.user, movies: data.movies}));
-        console.log('At Profile screen');
+        console.log('Going to Profile screen');
       }
     );
 
@@ -168,6 +168,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 25,
     marginBottom: 10,
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    marginLeft: 20,
   },
   moviesList: {
     flex: 1,
@@ -187,6 +190,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     marginLeft: 10,
+    width: "70%",
   },
   movieImage: {
     height: '100%',

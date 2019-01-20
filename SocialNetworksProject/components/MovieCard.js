@@ -127,9 +127,6 @@ export default class MovieCard extends React.Component {
       let { email } = await fbApi.getUserInfo();
       console.log('Email is ', email);
 
-      // TESTING: Override the email
-      //email = 'l@gmail.com';
-
       console.log(`Getting recommendations for user ${email}.`);
       return api.getRecommendations(email, 0, nrOfMoviesToFetch);
     }
