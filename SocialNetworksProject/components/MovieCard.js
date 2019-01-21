@@ -17,7 +17,7 @@ const iconSize = 120;
 const minNrOfMovies = 5;
 //The amount of movies to cache before the API should be updated
 const nrOfCachedMovied = 5;
-const nrOfMoviesToFetch = 20;
+const nrOfMoviesToFetch = 50;
 
 export default class MovieCard extends React.Component {
 
@@ -230,7 +230,7 @@ export default class MovieCard extends React.Component {
         //If the user clicks on the card more information about the movie should be shown
         else if(gestureState.dx > -10 && gestureState.dx < 10
           && gestureState.dy > -10 && gestureState.dy < 10){
-          this.redirectToMovieScreen(movies[this.state.currentIndex]);
+          this.redirectToMovieScreen(this.state.movies[this.state.currentIndex]);
         }
         else {
           Animated.spring(this.position, {

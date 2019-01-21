@@ -73,7 +73,7 @@ export default class ProfileScreen extends React.Component {
       userInfo.movies = userInfo.movies.data;
 
       const hostString = await AsyncStorage.getItem('hostString');
-      api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
+      const api = hostString === 'mock' ? new MockApi(hostString) : new Api(hostString);
       //Get user from Api
       let user = await api.getUser(userInfo.email);
       if(user.length === 0) {
@@ -81,6 +81,9 @@ export default class ProfileScreen extends React.Component {
         console.log("Creating new user...");
         user = await api.addUser(userInfo);
         console.log("New user created");
+        console.log("Getting new user");
+        user = await api.getUser(userInfo.email);
+        console.log("Created user: ", user);
       }
 
       return user;
